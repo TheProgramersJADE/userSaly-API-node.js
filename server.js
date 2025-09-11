@@ -6,13 +6,13 @@ const path = require('path');
 const app = express();
 const port = parseInt(process.env.PORT) || process.argv[3] || 8080;
 
-//const dbOptions = {
-  //host: 'mysql-10406947-emilyflores-7171.b.aivencloud.com',
-  //port: '11292',
-  //user: 'avnadmin',
-  //password: 'passworde la base',
-  //database: 'UsuariosSaly'
-//}
+const dbOptions = {
+  host: 'mysql-10406947-emilyflores-7171.b.aivencloud.com',
+  port: '11292',
+  user: 'avnadmin',
+  password: 'passwor de la base',
+  database: 'UsuariosSaly'
+}
 
 // middlewares ---------------------------------------------------
 app.use(myconn(mysql, dbOptions, 'single'))
