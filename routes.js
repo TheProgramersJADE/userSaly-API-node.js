@@ -62,17 +62,36 @@ routes.post('/', async (req, res) => {
         })
      })
   })
-  //Actualizar un registro
-  routes.put('/:id', (req, res)=>{
-    req.getConnection((err, conn)=>{
-         if(err)  return res.send(err)
-         
-          conn.query('UPDATE users set ? WHERE id = ?', [req.body, req.params.id], (err, rows)=>{
-            if(err)  return res.send(err)
+
+  //Actualizar un registro.----------------------------------------------------
+  routes.put('/:id', async (req, res) => {
+    const { username, email, password, role_id } = req.body;
   
-              res.send('Registro actualizado con exito!')
-          })
-       })
-    })
+    try {
+      // Creamos un objeto solo con los campos que siempre queremos actualizar
+      let updatedUser = { username, email, role_id };
+  
+      // Si el password viene en el body, lo encriptamos y lo agregamos
+      if (password) {
+        updatedUser.password = await bcrypt.hash(password, 10);
+      }
+  
+      req.getConnection((err, conn) => {
+        if (err) return res.send(err);
+  
+        conn.query(
+          'UPDATE users SET ? WHERE id = ?',
+          [updatedUser, req.params.id],
+          (err, rows) => {
+            if (err) return res.send(err);
+  
+            res.send('Usuario actualizado con éxito.');
+          }
+        );
+      });
+    } catch (error) {
+      res.status(500).send('Error al actualizar usuario');
+    }
+  }); 
 //----------------------------------------------------------------------
 module.exports = routes

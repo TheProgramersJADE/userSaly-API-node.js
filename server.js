@@ -10,7 +10,7 @@ const dbOptions = {
   host: 'mysql-10406947-emilyflores-7171.b.aivencloud.com',
   port: '11292',
   user: 'avnadmin',
-  password: 'agrega el password',
+  password: 'tu contraseña',
   database: 'UsuariosSaly'
 }
 
