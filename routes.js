@@ -7,8 +7,8 @@ const routes = express.Router()
   req.getConnection((err, conn)=>{
        if(err)  return res.send(err)
        
-        conn.query('SELECT * FROM users', (err, rows)=>{
-          if(err)  return res.send(err)
+        conn.query('SELECT id, username, email, role_id FROM users', (err, rows) => {
+          if (err) return res.status(500).json({ error: 'Error al obtener los usuarios' });
 
             res.json(rows)
         })
