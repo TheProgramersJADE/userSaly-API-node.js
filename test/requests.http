@@ -8,27 +8,27 @@ POST http://localhost:8080/usuarioslist HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "emyylis",
-  "email": "emyliis@example.com",
+  "username": "jemimi",
+  "email": "jemimiara@gmail.com",
   "password": "123456",
-  "role_id": 3
+  "role_id": 2
 }
 
 //Eliminar un regsitro de la base de datos. -----------------------------------------
 
 ###
-DELETE http://localhost:8080/usuarioslist/4 HTTP/1.1
+DELETE http://localhost:8080/usuarioslist/5 HTTP/1.1
 
 //Actualizar datos en la base de datos------------------------------------------------
 
 ###
-PUT http://localhost:8080/usuarioslist/5 HTTP/1.1
+PUT http://localhost:8080/usuarioslist/6 HTTP/1.1
 Content-Type: application/json
 
 {
   "username": "Libeth",
-  "email": "emylis@example.com",
-  "password": "emily",
+  "email": "emylis@gmail.com",
+  "password": "123456",
   "role_id": 1
 }
 
