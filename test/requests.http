@@ -45,3 +45,9 @@ Content-Type: application/json
   "email": "emylis@gmail.com",
   "password": "123456"
 }
+
+### Usar token para ruta protegida (GET usuario por ID)
+GET http://localhost:8080/usuarioslist/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwidXNlcm5hbWUiOiJMaWJldGgiLCJyb2xlX2lkIjoxLCJpYXQiOjE3NTc3MDIzOTYsImV4cCI6MTc1NzcwNTk5Nn0.9RCNWnulzhngD9-02XY3rfuTMxvZ1R2mkztug16Jcb4
+
+

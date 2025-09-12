@@ -1,6 +1,9 @@
 const express = require('express')
 const bcrypt = require('bcrypt');
 const routes = express.Router()
+const { verifyToken } = require('../../../middlewares/auth');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'mi_secreto_super_seguro';
 
 //para visualizar todos los registros de la tabla de users------------
  routes.get('/', (req, res)=>{
@@ -93,63 +96,55 @@ routes.post('/', async (req, res) => {
       res.status(500).send('Error al actualizar usuario');
     }
   }); 
-
-  // Obtener un solo usuario por ID --------------------------------------------------------
-routes.get('/:id', (req, res) => {
-  const { id } = req.params;
-
-  req.getConnection((err, conn) => {
-    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos' });
-
-    conn.query('SELECT id, username, email, role_id FROM users WHERE id = ?', [id], (err, results) => {
-      if (err) return res.status(500).json({ error: 'Error en la consulta SQL' });
-
-      if (results.length === 0) {
-        return res.status(404).json({ error: 'Usuario no encontrado.' });
-      }
-
-      res.status(200).json(results[0]); // regresa solo el usuario encontrado
+//Obtener un solo usuario por ID.----------------------------------------------------------------
+  routes.get('/:id', verifyToken, (req, res) => {
+    const { id } = req.params;
+  
+    req.getConnection((err, conn) => {
+      if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos' });
+  
+      conn.query('SELECT id, username, email, role_id FROM users WHERE id = ?', [id], (err, results) => {
+        if (err) return res.status(500).json({ error: 'Error en la consulta SQL' });
+        if (results.length === 0) return res.status(404).json({ error: 'Usuario no encontrado.' });
+  
+        res.status(200).json(results[0]);
+      });
     });
   });
-});
+  
 
-
-  //  LOGIN ----------------------------------------------------------------------------
+// Ruta login
 routes.post('/login', (req, res) => {
   const { email, password } = req.body;
-
-  // Validación rápida
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Faltan datos (email y password)' });
-  }
+  if (!email || !password) return res.status(400).json({ error: 'Faltan datos' });
 
   req.getConnection((err, conn) => {
     if (err) return res.status(500).json({ error: 'Error de conexión a la BD' });
 
-    // Buscar usuario por email
+    // Verificar si el usuario existe
     conn.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
       if (err) return res.status(500).json({ error: 'Error en la consulta' });
-      if (results.length === 0) {
-        return res.status(401).json({ error: 'Usuario no encontrado' });
-      }
+      if (results.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
 
       const user = results[0];
 
       try {
-        // Comparar password con bcrypt
+
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-          return res.status(401).json({ error: 'Contraseña incorrecta' });
-        }
+        if (!isMatch) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
-// Si todo bien, devolvemos usuario (sin contraseña)
-const { password: _, username } = user;
+        // Generar token
+        const token = jwt.sign(
+          { id: user.id, username: user.username, role_id: user.role_id },
+          JWT_SECRET,
+          { expiresIn: '8h' }
+        );
 
-res.json({
-  mensaje: 'Inicio de sesión exitoso, bienvenido 🚀',
-  user: { username } // 👉 solo se devuelve username
-});
-
+        res.json({
+          mensaje: 'Inicio de sesión exitoso ',
+          username: user.username,
+          token
+        });
       } catch (err) {
         return res.status(500).json({ error: 'Error al verificar contraseña' });
       }
