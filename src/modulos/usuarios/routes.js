@@ -93,5 +93,48 @@ routes.post('/', async (req, res) => {
       res.status(500).send('Error al actualizar usuario');
     }
   }); 
+
+  //  LOGIN ----------------------------------------------------------------------------
+routes.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  // Validación rápida
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Faltan datos (email y password)' });
+  }
+
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la BD' });
+
+    // Buscar usuario por email
+    conn.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Error en la consulta' });
+      if (results.length === 0) {
+        return res.status(401).json({ error: 'Usuario no encontrado' });
+      }
+
+      const user = results[0];
+
+      try {
+        // Comparar password con bcrypt
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
+
+// Si todo bien, devolvemos usuario (sin contraseña)
+const { password: _, username } = user;
+
+res.json({
+  mensaje: 'Inicio de sesión exitoso, bienvenido 🚀',
+  user: { username } // 👉 solo se devuelve username
+});
+
+      } catch (err) {
+        return res.status(500).json({ error: 'Error al verificar contraseña' });
+      }
+    });
+  });
+});
 //----------------------------------------------------------------------
 module.exports = routes
