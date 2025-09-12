@@ -94,6 +94,26 @@ routes.post('/', async (req, res) => {
     }
   }); 
 
+  // Obtener un solo usuario por ID --------------------------------------------------------
+routes.get('/:id', (req, res) => {
+  const { id } = req.params;
+
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos' });
+
+    conn.query('SELECT id, username, email, role_id FROM users WHERE id = ?', [id], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Error en la consulta SQL' });
+
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+
+      res.status(200).json(results[0]); // regresa solo el usuario encontrado
+    });
+  });
+});
+
+
   //  LOGIN ----------------------------------------------------------------------------
 routes.post('/login', (req, res) => {
   const { email, password } = req.body;
