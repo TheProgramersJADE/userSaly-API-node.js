@@ -95,23 +95,55 @@ routes.post('/', async (req, res) => {
     } catch (error) {
       res.status(500).send('Error al actualizar usuario');
     }
-  }); 
-//Obtener un solo usuario por ID.----------------------------------------------------------------
-  routes.get('/:id', verifyToken, (req, res) => {
-    const { id } = req.params;
-  
-    req.getConnection((err, conn) => {
-      if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos' });
-  
-      conn.query('SELECT id, username, email, role_id FROM users WHERE id = ?', [id], (err, results) => {
-        if (err) return res.status(500).json({ error: 'Error en la consulta SQL' });
-        if (results.length === 0) return res.status(404).json({ error: 'Usuario no encontrado.' });
-  
-        res.status(200).json(results[0]);
-      });
+  });   
+
+// Obtener todos los roles
+routes.get('/roles', (req, res) => {
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la BD' });
+
+    conn.query('SELECT id, name FROM roles', (err, results) => {
+      if (err) return res.status(500).json({ error: 'Error en la consulta SQL' });
+      res.json(results);
     });
   });
-  
+});
+
+// Filtro de busqueda por email y rol
+routes.get('/buscar', (req, res) => {
+  const { email, role_id } = req.query; // role_id viene del select
+
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la BD' });
+
+    let sql = `
+      SELECT u.id, u.username, u.email, r.name as role
+      FROM users u
+      JOIN roles r ON u.role_id = r.id
+    `;
+    const params = [];
+    const where = [];
+
+    if (email) {
+      where.push('u.email LIKE ?');
+      params.push(`%${email}%`);
+    }
+
+    if (role_id) {
+      where.push('r.id = ?');
+      params.push(role_id);
+    }
+
+    if (where.length > 0) {
+      sql += ' WHERE ' + where.join(' AND ');
+    }
+
+    conn.query(sql, params, (err, results) => {
+      if (err) return res.status(500).json({ error: 'Error en la consulta SQL' });
+      res.json(results);
+    });
+  });
+});
 
 // Ruta login
 routes.post('/login', (req, res) => {
@@ -151,5 +183,21 @@ routes.post('/login', (req, res) => {
     });
   });
 });
+//Obtener un solo usuario por ID.----------------------------------------------------------------
+routes.get('/:id', verifyToken, (req, res) => {
+  const { id } = req.params;
+
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos' });
+
+    conn.query('SELECT id, username, email, role_id FROM users WHERE id = ?', [id], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Error en la consulta SQL' });
+      if (results.length === 0) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+      res.status(200).json(results[0]);
+    });
+  });
+});
+
 //----------------------------------------------------------------------
 module.exports = routes

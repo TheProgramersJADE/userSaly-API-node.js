@@ -1,10 +1,13 @@
-// Para probar el metodo GET, Resultado toda la lista de usuarios.----------------
-###
-GET  http://localhost:8080/usuarioslist HTTP/1.1
+###############################################
+# CRUD Usuarios + Login + Roles + Búsqueda
+###############################################
 
-//Agregar un nuevo registro a la base de datos.------------------------------------
-### 
-POST http://localhost:8080/usuarioslist HTTP/1.1
+### Obtener toda la lista de usuarios
+GET http://localhost:8080/usuarioslist
+Accept: application/json
+
+### Agregar un nuevo usuario
+POST http://localhost:8080/usuarioslist
 Content-Type: application/json
 
 {
@@ -14,30 +17,53 @@ Content-Type: application/json
   "role_id": 2
 }
 
-//Eliminar un regsitro de la base de datos. -----------------------------------------
+### Eliminar un usuario por ID
+DELETE http://localhost:8080/usuarioslist/7
+Accept: application/json
 
-###
-DELETE http://localhost:8080/usuarioslist/5 HTTP/1.1
-
-//Actualizar datos en la base de datos------------------------------------------------
-
-###
-PUT http://localhost:8080/usuarioslist/6 HTTP/1.1
+### Actualizar usuario por ID
+PUT http://localhost:8080/usuarioslist/6
 Content-Type: application/json
 
 {
-  "username": "Libeth",
+  "username": "Liss",
   "email": "emylis@gmail.com",
   "password": "123456",
   "role_id": 1
 }
 
-//Obtener por ID, SOLO UN USUARIO POR SU ID
-### 
-GET http://localhost:8080/usuarioslist/6
 
-// Prueba del login --------------------------------------------------------------------
-###
+### Obtener todos los roles
+GET http://localhost:8080/usuarioslist/roles
+Accept: application/json
+
+### ---------------------------
+### RUTAS DE BÚSQUEDA POR EMAIL Y/O ROL
+### ---------------------------
+
+### Buscar todos los usuarios (sin filtros)
+GET http://localhost:8080/usuarioslist/buscar
+Accept: application/json
+
+### Buscar usuarios por email
+GET http://localhost:8080/usuarioslist/buscar?email=emily
+Accept: application/json
+
+### Buscar usuarios por rol (role_id)
+GET http://localhost:8080/usuarioslist/buscar?role_id=3
+Accept: application/json
+
+### Buscar usuarios por email y rol combinados
+GET http://localhost:8080/usuarioslist/buscar?email=emily&role_id=2
+Accept: application/json
+
+
+### Obtener un usuario por ID (ruta protegida)
+GET http://localhost:8080/usuarioslist/6
+Authorization: Bearer <TU_TOKEN>
+Accept: application/json
+
+### Login (obtener token JWT)
 POST http://localhost:8080/usuarioslist/login
 Content-Type: application/json
 
@@ -45,9 +71,3 @@ Content-Type: application/json
   "email": "emylis@gmail.com",
   "password": "123456"
 }
-
-### Usar token para ruta protegida (GET usuario por ID)
-GET http://localhost:8080/usuarioslist/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwidXNlcm5hbWUiOiJMaWJldGgiLCJyb2xlX2lkIjoxLCJpYXQiOjE3NTc3MDIzOTYsImV4cCI6MTc1NzcwNTk5Nn0.9RCNWnulzhngD9-02XY3rfuTMxvZ1R2mkztug16Jcb4
-
-
