@@ -4,10 +4,10 @@ POST http://localhost:8080/usuarioslist
 Content-Type: application/json
 
 {
-  "username": "jemimi",
-  "email": "jemimiara@gmail.com",
+  "username": "Santiago",
+  "email": "santiago@gmail.com",
   "password": "123456",
-  "role_id": 3
+  "role_id": 1
 }
 
 // Login (público)
@@ -16,7 +16,7 @@ POST http://localhost:8080/usuarioslist/login
 Content-Type: application/json
 
 {
-  "email": "jemimiara@gmail.com",
+  "email": "santiago@gmail.com",
   "password": "123456"
 }
 

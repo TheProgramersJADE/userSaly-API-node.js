@@ -9,6 +9,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'mi_secreto_super_seguro';
 routes.post('/', async (req, res) => {
   const { username, email, password, role_id } = req.body;
 
+  const camposFaltantes = {};
+  if (!username) camposFaltantes.username = 'requerido';
+  if (!email) camposFaltantes.email = 'requerido';
+  if (!password) camposFaltantes.password = 'requerido';
+
+  if (Object.keys(camposFaltantes).length > 0) {
+    return res.status(400).json({
+      error: 'Faltan campos obligatorios',
+      camposFaltantes
+   });
+  }
+
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -16,7 +28,7 @@ routes.post('/', async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      role_id: role_id || null
+      role_id: role_id || 1
     };
 
     req.getConnection((err, conn) => {
@@ -39,7 +51,18 @@ routes.post('/', async (req, res) => {
 // Login
 routes.post('/login', (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Faltan datos' });
+
+  // Validación de campos obligatorios
+  const camposFaltantes = {};
+  if (!email) camposFaltantes.email = 'requerido';
+  if (!password) camposFaltantes.password = 'requerido';
+
+  if (Object.keys(camposFaltantes).length > 0) {
+    return res.status(400).json({
+      error: 'Faltan campos obligatorios',
+      camposFaltantes
+    });
+  }
 
   req.getConnection((err, conn) => {
     if (err) return res.status(500).json({ error: 'Error de conexión a la BD' });
@@ -153,34 +176,44 @@ routes.get('/:id', verifyToken, onlyAdmin, (req, res) => {
   });
 });
 
-// Actualizar usuario
+// Actualizar usuario (parcial)
 routes.put('/:id', verifyToken, onlyAdmin, async (req, res) => {
   const { username, email, password, role_id } = req.body;
 
   try {
-    let updatedUser = { username, email, role_id };
+    let updatedUser = {};
+
+    if (username) updatedUser.username = username;
+    if (email) updatedUser.email = email;
+    if (role_id) updatedUser.role_id = role_id;
 
     if (password) {
       updatedUser.password = await bcrypt.hash(password, 10);
     }
 
+    // Si no hay ningún campo para actualizar
+    if (Object.keys(updatedUser).length === 0) {
+      return res.status(400).json({ error: 'No se proporcionaron datos para actualizar' });
+    }
+
     req.getConnection((err, conn) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).json({ error: 'Error de conexión a la BD' });
 
       conn.query(
         'UPDATE users SET ? WHERE id = ?',
         [updatedUser, req.params.id],
         (err, rows) => {
-          if (err) return res.send(err);
+          if (err) return res.status(500).json({ error: 'Error en la consulta' });
 
-          res.send('Usuario actualizado con éxito.');
+          res.json({ mensaje: 'Usuario actualizado con éxito' });
         }
       );
     });
   } catch (error) {
-    res.status(500).send('Error al actualizar usuario');
+    res.status(500).json({ error: 'Error al actualizar usuario' });
   }
 });
+
 
 // Eliminar usuario
 routes.delete('/:id', verifyToken, onlyAdmin, (req, res) => {
