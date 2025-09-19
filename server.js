@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const myconn = require('express-myconnection');
-const routes = require('./modulos/usuarios/routes')
+const routes = require('./src/modulos/usuarios/routes')
 const path = require('path');
 const app = express();
 const port = parseInt(process.env.PORT) || process.argv[3] || 8080;
@@ -10,7 +10,7 @@ const dbOptions = {
   host: 'mysql-10406947-emilyflores-7171.b.aivencloud.com',
   port: '11292',
   user: 'avnadmin',
-  password: 'tu password',
+  password: 'tu contrasenna',
   database: 'UsuariosSaly'
 }
 

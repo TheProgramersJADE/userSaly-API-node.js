@@ -4,10 +4,10 @@ POST http://localhost:8080/usuarioslist
 Content-Type: application/json
 
 {
-  "username": "Santiago",
-  "email": "santiago@gmail.com",
-  "password": "123456",
-  "role_id": 1
+  "username": "Keniaaaa",
+  "email": "keniaaa@gmail.com",
+  "password": "12345",
+  "role_id": 2
 }
 
 // Login (público)
@@ -16,8 +16,8 @@ POST http://localhost:8080/usuarioslist/login
 Content-Type: application/json
 
 {
-  "email": "santiago@gmail.com",
-  "password": "123456"
+  "email": "keniaaaa@gmail.com",
+  "password": "12345"
 }
 
 // Listar todos los usuarios (solo ADMIN)

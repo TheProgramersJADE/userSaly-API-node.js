@@ -25,5 +25,17 @@ function onlyAdmin(req, res, next) {
   next();
 }
 
+function onlyTrabajador(req, res, next) {
+  if (!req.user) return res.status(401).json({ error: 'No tienes acceso a esta ruta' });
+  if (req.user.role_id !== 2) return res.status(403).json({ error: 'Acceso denegado: solo trabajadores' });
+  next();
+}
+function onlyCliente(req, res, next) {
+  if (!req.user) return res.status(401).json({ error: 'No tienes acceso a esta ruta' });
+  if (req.user.role_id !== 1) return res.status(403).json({ error: 'Acceso denegado: solo cliente' });
+  next();
+}
+
+
 // Exportar ambos middlewares correctamente
-module.exports = { verifyToken, onlyAdmin };
+module.exports = { verifyToken, onlyAdmin, onlyTrabajador, onlyCliente };
