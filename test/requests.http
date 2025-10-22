@@ -16,15 +16,16 @@ POST http://localhost:8080/usuarioslist/login
 Content-Type: application/json
 
 {
-  "email": "keniaaaa@gmail.com",
+  "email": "ivan@gmail.com",
   "password": "12345"
 }
 
-// Listar todos los usuarios (solo ADMIN)
+//Listar Usuarios por paginacion. (solo ADMIN)
 ###
-GET http://localhost:8080/usuarioslist
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwidXNlcm5hbWUiOiJqZW1pbWkiLCJyb2xlX2lkIjozLCJpYXQiOjE3NTc5OTExODcsImV4cCI6MTc1ODAxOTk4N30.wXdNa7chBCKa0Yh-0aeOrhsdPxA74ppT-IRxpifsHcA
+GET http://localhost:8080/usuarioslist?page=2&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAsInVzZXJuYW1lIjoiaXZhbiIsInJvbGVfaWQiOjMsImlhdCI6MTc2MTEwNDMxOCwiZXhwIjoxNzYxMTMzMTE4fQ.qjjVxuQVbT_lJyxJ4Lk70oPygzZkzduzysIYOZnur1I
 Accept: application/json
+
 
 // Eliminar usuario por ID (solo ADMIN)
 ###

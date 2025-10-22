@@ -99,18 +99,39 @@ routes.post('/login', (req, res) => {
 // RUTAS PROTEGIDAS (ADMIN)
 // ----------------------------
 
-// Obtener todos los usuarios
+// Obtener todos los usuarios con paginación
 routes.get('/', verifyToken, onlyAdmin, (req, res) => {
   req.getConnection((err, conn) => {
-    if (err) return res.send(err);
+    if (err) return res.status(500).json({ error: 'Error de conexión a la BD' });
 
-    conn.query('SELECT id, username, email, role_id FROM users', (err, rows) => {
+    // Parámetros de paginación (por defecto: página 1, 10 registros por página)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Consulta para obtener los usuarios paginados
+    conn.query('SELECT id, username, email, role_id FROM users LIMIT ? OFFSET ?', [limit, offset], (err, rows) => {
       if (err) return res.status(500).json({ error: 'Error al obtener los usuarios' });
 
-      res.json(rows);
+      // Obtener el total de registros para calcular las páginas
+      conn.query('SELECT COUNT(*) AS total FROM users', (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al contar los usuarios' });
+
+        const total = result[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        res.json({
+          page,
+          limit,
+          total,
+          totalPages,
+          data: rows
+        });
+      });
     });
   });
 });
+
 
 // Obtener todos los roles
 routes.get('/roles', verifyToken, onlyAdmin, (req, res) => {
